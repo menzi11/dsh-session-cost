@@ -1,0 +1,70 @@
+{
+  "format": 1,
+  "title": {
+    "en": "menzi11's DeepSeek Harness plugins",
+    "zh": "menzi11 的 DeepSeek Harness 插件"
+  },
+  "description": {
+    "en": "Small client plugins for DeepSeek Harness. Add this URL as a market source in Settings → Plugins.",
+    "zh": "给 DeepSeek Harness 用的小插件。在 设置 → 插件 里把这个地址加成市场源即可。"
+  },
+  "metadata": {
+    "categories": {
+      "ui": {
+        "title": { "en": "Interface", "zh": "界面" }
+      }
+    },
+    "labels": {
+      "usage": {
+        "title": { "en": "Usage and cost", "zh": "用量与成本" }
+      }
+    },
+    "sortKeys": {}
+  },
+  "plugins": [
+    {
+      "name": "dsh-session-cost",
+      "title": {
+        "en": "Session cost card",
+        "zh": "会话成本卡"
+      },
+      "description": {
+        "en": "A flat card beside the conversation with this session's estimated spend, the peak/off-peak split, the unit prices in force, and a countdown to the next tier switch.",
+        "zh": "对话右侧的平面卡片：本会话估算花费、高峰与谷时的花费构成、当前生效的峰谷单价，以及距离下次峰谷切换的倒计时。"
+      },
+      "icon": "icon.svg",
+      "author": "menzi11",
+      "homepage": "https://github.com/menzi11/dsh-session-cost",
+      "repository": {
+        "url": "https://github.com/menzi11/dsh-session-cost"
+      },
+      "metadata": {
+        "category": "ui",
+        "keywords": [
+          "cost",
+          "pricing",
+          "usage",
+          "peak",
+          "off-peak",
+          "deepseek"
+        ],
+        "labels": ["usage"],
+        "sortKeys": {}
+      },
+      "versions": [
+        {
+          "version": "1.0.0",
+          "publishTimestamp": 1794713344,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/menzi11/dsh-session-cost.git",
+            "commit": "e349f9eafe1bc8596076c6d9d4c7294b8f03b228"
+          },
+          "engines": {
+            "dsh": ">=0.2.2-0"
+          }
+        }
+      ]
+    }
+  ]
+}
