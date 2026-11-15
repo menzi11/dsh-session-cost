@@ -1,0 +1,3 @@
+- insert:
+    - id: session-cost-hud
+      name: dsh-session-cost

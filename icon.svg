@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Session cost window">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1d2733"/>
+      <stop offset="1" stop-color="#101820"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3fbf7f"/>
+      <stop offset="0.58" stop-color="#3fbf7f"/>
+      <stop offset="0.58" stop-color="#e8a33d"/>
+      <stop offset="1" stop-color="#e8a33d"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#bg)"/>
+  <rect x="2.75" y="2.75" width="58.5" height="58.5" rx="13.25" fill="none" stroke="#2c3a49" stroke-width="1.5"/>
+  <path d="M43 10.5v43" stroke="#233040" stroke-width="1.5"/>
+  <path d="M49 17.5v29" stroke="#2f3f52" stroke-width="3" stroke-linecap="round"/>
+  <path d="M14 34l7-7 5 5 7-9 5 6" fill="none" stroke="url(#edge)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M20 22h12M20 27h12" stroke="#e7edf4" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M26 22v16M26 38v3" stroke="#e7edf4" stroke-width="2.4" stroke-linecap="round"/>
+  <circle cx="49" cy="17.5" r="2.6" fill="#e8a33d"/>
+  <circle cx="49" cy="46.5" r="2.6" fill="#3fbf7f"/>
+</svg>

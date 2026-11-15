@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "Session cost card",
+    "description": "A flat card at the right of the conversation with this session's estimated spend, the peak/off-peak split, and the unit prices in force.",
+    "detail": "docs/DETAIL.md"
+  }
+}

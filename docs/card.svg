@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 520" width="560" height="520" role="img" aria-label="The session cost card: ¥1.57 total, a four-row token ledger, a peak/off-peak share bar, and a two-column unit price table">
+  <rect x="8" y="8" width="544" height="504" rx="12" fill="#0e1014" stroke="#333a45" stroke-width="1"/>
+  <g font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" fill="#e8ebf0">
+    <text x="28" y="42" font-size="15" font-weight="600">会话成本</text>
+    <rect x="452" y="27" width="76" height="24" rx="12" fill="none" stroke="#333a45"/>
+    <circle cx="466" cy="39" r="4" fill="#43bd83"/>
+    <text x="476" y="43" font-size="14" font-weight="600">谷时</text>
+
+    <text x="28" y="92" font-size="32" font-weight="650">¥1.57</text>
+    <text x="28" y="116" font-size="14" fill="#98a1ad">估算 · 166 次请求 · 缓存命中 99% · 仅已加载</text>
+
+    <text x="330" y="148" font-size="12" fill="#98a1ad" text-anchor="end">tokens</text>
+    <text x="552" y="148" font-size="12" fill="#98a1ad" text-anchor="end">金额</text>
+
+    <text x="28" y="176" font-size="15">输入（缓存未命中）</text>
+    <text x="330" y="176" font-size="15" fill="#98a1ad" text-anchor="end">209k</text>
+    <text x="552" y="176" font-size="15" text-anchor="end">¥0.209</text>
+
+    <text x="28" y="202" font-size="15">输入（缓存命中）</text>
+    <text x="330" y="202" font-size="15" fill="#98a1ad" text-anchor="end">36.65M</text>
+    <text x="552" y="202" font-size="15" text-anchor="end">¥0.733</text>
+
+    <text x="28" y="228" font-size="15">输出</text>
+    <text x="330" y="228" font-size="15" fill="#98a1ad" text-anchor="end">158k</text>
+    <text x="552" y="228" font-size="15" text-anchor="end">¥0.633</text>
+
+    <rect x="28" y="246" width="524" height="1" fill="#333a45"/>
+
+    <text x="28" y="270" font-size="12" fill="#98a1ad">高峰 / 谷时 花费占比</text>
+    <rect x="28" y="280" width="524" height="8" rx="4" fill="#43bd83"/>
+
+    <text x="28" y="312" font-size="14"><tspan fill="#98a1ad">其中高峰 · 0 次</tspan></text>
+    <text x="552" y="312" font-size="14" text-anchor="end">¥0</text>
+    <text x="28" y="334" font-size="14"><tspan fill="#98a1ad">其中谷时 · 166 次</tspan></text>
+    <text x="552" y="334" font-size="14" text-anchor="end">¥1.57</text>
+
+    <rect x="28" y="352" width="524" height="1" fill="#333a45"/>
+
+    <text x="28" y="376" font-size="12" fill="#98a1ad">峰谷单价</text>
+    <text x="440" y="376" font-size="12" font-weight="700" text-anchor="end">谷时</text>
+    <text x="552" y="376" font-size="12" fill="#98a1ad" text-anchor="end">高峰</text>
+
+    <text x="28" y="402" font-size="15">输入（缓存命中）</text>
+    <text x="440" y="402" font-size="15" text-anchor="end">¥0.02</text>
+    <text x="552" y="402" font-size="15" fill="#98a1ad" text-anchor="end">¥0.04</text>
+
+    <text x="28" y="428" font-size="15">输入（缓存未命中）</text>
+    <text x="440" y="428" font-size="15" text-anchor="end">¥1.00</text>
+    <text x="552" y="428" font-size="15" fill="#98a1ad" text-anchor="end">¥2.00</text>
+
+    <text x="28" y="454" font-size="15">输出</text>
+    <text x="440" y="454" font-size="15" text-anchor="end">¥4.00</text>
+    <text x="552" y="454" font-size="15" fill="#98a1ad" text-anchor="end">¥8.00</text>
+
+    <text x="28" y="476" font-size="13" fill="#98a1ad">¥ / 百万 tokens · deepseek-flash</text>
+    <text x="28" y="498" font-size="13" fill="#98a1ad">进入高峰 · 1天11小时后 · 更新于 21:19</text>
+  </g>
+</svg>

@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>会话成本卡 · 最终外观预览</title>
+<style>
+  :root {
+    --bg-base: #0e1014;
+    --bg-sidebar: #13161b;
+    --bg-layer-1: #171a20;
+    --bg-layer-2: #1d2129;
+    --bg-overlay: #1a1e25;
+    --border-l1: #262b33;
+    --border-l2: #333a45;
+    --label-primary: #e8ebf0;
+    --label-secondary: #98a1ad;
+    --brand: #5b8dff;
+    --warn: #e5a13c;
+    --ok: #43bd83;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg-base); color: var(--label-primary);
+    font: 14px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app { display: flex; height: 100vh; min-width: 940px; }
+
+  .sidebar {
+    width: 244px; flex: none; background: var(--bg-sidebar);
+    border-right: 1px solid var(--border-l1); display: flex; flex-direction: column; padding: 10px;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; padding: 6px 8px 14px; font-weight: 600; font-size: 13px; }
+  .brand .mark { width: 18px; height: 18px; border-radius: 5px; background: linear-gradient(135deg, #2c67d6, #6c8dff); }
+  .side-label { font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--label-secondary); padding: 8px; }
+  .ws { font-size: 12.5px; padding: 5px 8px; border-radius: 7px; display: flex; justify-content: space-between; }
+  .ws.active { background: var(--bg-layer-2); }
+  .ws span:last-child { color: var(--label-secondary); font-size: 11px; }
+  .session {
+    margin: 1px 0 0 8px; padding: 6px 8px; border-radius: 7px; font-size: 12.5px; color: var(--label-secondary);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .session.active { background: var(--bg-layer-2); color: var(--label-primary); }
+  .sidebar-foot { margin-top: auto; padding: 10px 8px; color: var(--label-secondary); font-size: 12.5px; }
+
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; position: relative; }
+  .topbar {
+    height: 52px; flex: none; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px; border-bottom: 1px solid var(--border-l1);
+  }
+  .crumb { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--label-secondary); min-width: 0; }
+  .crumb b { color: var(--label-primary); font-weight: 550; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 46ch; }
+  .dots { display: flex; gap: 6px; }
+  .dot-btn { width: 26px; height: 26px; border-radius: 7px; border: 1px solid var(--border-l1); background: var(--bg-layer-1); }
+  .chat { flex: 1; overflow: auto; padding: 26px 0 8px; }
+  .thread { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+  .user-row { display: flex; justify-content: flex-end; margin-bottom: 18px; }
+  .bubble {
+    background: var(--bg-layer-2); border: 1px solid var(--border-l1); border-radius: 12px;
+    padding: 10px 13px; max-width: 78%; font-size: 13.5px;
+  }
+  .assistant { font-size: 13.5px; }
+  .assistant p { margin: 0 0 10px; }
+  .tool-row {
+    display: flex; align-items: center; gap: 8px; padding: 6px 10px; margin: 0 0 12px;
+    border: 1px solid var(--border-l1); border-radius: 8px; background: var(--bg-layer-1);
+    font-size: 12px; color: var(--label-secondary);
+  }
+  .tool-row code { color: var(--label-primary); font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
+
+  .composer-wrap { padding: 6px 24px 14px; }
+  .composer {
+    max-width: 720px; margin: 0 auto; background: var(--bg-layer-1);
+    border: 1px solid var(--border-l2); border-radius: 14px; padding: 10px 12px 8px;
+  }
+  .composer .prompt { color: var(--label-secondary); font-size: 13.5px; padding: 2px 2px 12px; }
+  .composer-row { display: flex; align-items: center; gap: 8px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 9px;
+    border-radius: 7px; border: 1px solid var(--border-l1); background: var(--bg-layer-2);
+    font-size: 11.5px; color: var(--label-secondary);
+  }
+  .pill.model { color: var(--label-primary); }
+  .spacer { flex: 1; }
+  .send { width: 28px; height: 28px; border-radius: 8px; background: var(--brand); border: 0; }
+  .dock { max-width: 720px; margin: 6px auto 0; display: flex; gap: 14px; padding: 0 2px; color: var(--label-secondary); font-size: 11px; }
+
+  /* ===== shipped card: classes and rules copied from client.js ===== */
+  .cst-card {
+    --cst-inset-right: 32px;
+    --cst-inset-top: 104px;
+    position: fixed; top: var(--cst-inset-top); right: var(--cst-inset-right); z-index: 40;
+    width: 302px; max-height: calc(100vh - 176px); overflow: auto;
+    padding: 14px;
+    background: var(--bg-base);
+    color: var(--label-primary);
+    border: 1px solid var(--border-l2);
+    border-radius: 12px;
+    box-shadow: none;
+    font: 12px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-variant-numeric: tabular-nums;
+    user-select: text;
+  }
+  .cst-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .cst-title { font-size: 11px; font-weight: 600; letter-spacing: 0.02em; }
+  .cst-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    height: 20px; padding: 0 8px; border-radius: 999px;
+    border: 1px solid var(--border-l1);
+    font-size: 11px; font-weight: 600;
+  }
+  .cst-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .cst-total { font-size: 26px; font-weight: 650; letter-spacing: -0.02em; line-height: 1.15; }
+  .cst-muted { color: var(--label-secondary); }
+  .cst-sub { font-size: 11px; color: var(--label-secondary); margin-bottom: 10px; }
+  .cst-table { width: 100%; border-collapse: collapse; }
+  .cst-table th {
+    font-weight: 500; font-size: 10px; letter-spacing: 0.03em;
+    color: var(--label-secondary); text-align: right; padding: 0 0 4px; white-space: nowrap;
+  }
+  .cst-table th:first-child, .cst-table td:first-child { text-align: left; }
+  .cst-table td { padding: 3px 0; text-align: right; white-space: nowrap; }
+  .cst-rule { height: 1px; margin: 10px 0; border: 0; background: var(--border-l1); }
+  .cst-bar { display: flex; height: 6px; border-radius: 999px; overflow: hidden; background: var(--bg-layer-2); }
+  .cst-bar > span { display: block; height: 100%; }
+  .cst-seg-peak { background: var(--warn); }
+  .cst-seg-offpeak { background: var(--ok); }
+  .cst-split-rows { margin-top: 6px; }
+  .cst-split-rows > div { display: flex; align-items: baseline; justify-content: space-between; font-size: 11.5px; }
+  .cst-label { font-size: 10px; letter-spacing: 0.03em; color: var(--label-secondary); }
+  .cst-price th.current { color: var(--label-primary); font-weight: 700; }
+  .cst-foot {
+    display: flex; flex-direction: column; gap: 3px; margin-top: 10px;
+    font-size: 10.5px; line-height: 1.55; color: var(--label-secondary);
+  }
+
+  .preview-note {
+    position: fixed; left: 12px; bottom: 12px; z-index: 50;
+    padding: 6px 10px; border-radius: 8px;
+    background: var(--bg-layer-2); border: 1px solid var(--border-l1);
+    color: var(--label-secondary); font-size: 11px; line-height: 1.5;
+  }
+  .preview-note a { color: var(--brand); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="mark"></span>DeepSeek Harness</div>
+    <div class="side-label">Workspaces</div>
+    <div class="ws active">default-workspace <span>3</span></div>
+    <div class="session active">会话成本卡</div>
+    <div class="session">右侧悬浮窗的早期原型</div>
+    <div class="session">插件清单排查</div>
+    <div class="session">Q3 报告导出</div>
+    <div class="sidebar-foot">◍ Settings</div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="crumb"><b>会话成本卡</b><span>· default-workspace</span></div>
+      <div class="dots"><span class="dot-btn"></span><span class="dot-btn"></span><span class="dot-btn"></span></div>
+    </div>
+    <div class="chat">
+      <div class="thread">
+        <div class="user-row"><div class="bubble">就它了. 开搞!</div></div>
+        <div class="assistant">
+          <p>B 定稿：平面账本卡，无投影，用底色和 1px 描边分层。账目按桶给「实际花掉的钱」，单价表单独放在下面，避免 tokens × 单价 对不上。</p>
+          <div class="tool-row">◧ <code>write</code> cost-hud-prototype/client.js <span>· 定稿</span></div>
+          <p>右上角那张卡就是最终外观：标题 + 峰谷徽标、总额、逐桶账目、峰谷占比、两列单价、倒计时。</p>
+        </div>
+      </div>
+    </div>
+    <div class="composer-wrap">
+      <div class="composer">
+        <div class="prompt">继续输入，或按 / 查看命令…</div>
+        <div class="composer-row">
+          <span class="pill model">deepseek-flash ▾</span>
+          <span class="pill">中</span>
+          <span class="spacer"></span>
+          <button class="send" aria-label="send"></button>
+        </div>
+      </div>
+      <div class="dock"><span>12 步 · 486k tokens</span><span>缓存命中 93%</span></div>
+    </div>
+  </main>
+</div>
+
+<div id="widget"></div>
+<div class="preview-note">
+  最终外观预览 · 数值为演示数据（按本机当前时间算峰谷）<br>
+  想同时看到高峰/谷时两段：<a href="?demo=mixed">?demo=mixed</a>
+</div>
+
+<script>
+  // ---------- pricing + tier rules (same as the shipped plugin) ----------
+  const SH_OFFSET = 8 * 60 * 60 * 1000
+  const PEAK_WINDOWS = [[9 * 60, 12 * 60], [14 * 60, 18 * 60]]
+  const PRICES = {
+    'deepseek-flash': { hit: 0.02, miss: 1, out: 4 },
+    'deepseek-v4-pro': { hit: 0.15, miss: 4.5, out: 13.5 },
+  }
+  const ALIASES = { 'deepseek-v4-flash': 'deepseek-flash', 'deepseek-v4-flash-vision-exp': 'deepseek-flash' }
+
+  function shParts(ms) {
+    const d = new Date(ms + SH_OFFSET)
+    return { day: d.getUTCDay(), mins: d.getUTCHours() * 60 + d.getUTCMinutes() }
+  }
+  function tierAt(ms) {
+    const p = shParts(ms)
+    if (p.day === 0 || p.day === 6) return 'offpeak'
+    for (const [from, to] of PEAK_WINDOWS) if (p.mins >= from && p.mins < to) return 'peak'
+    return 'offpeak'
+  }
+  function nextChangeAt(ms) {
+    const current = tierAt(ms)
+    let t = Math.floor(ms / 60000) * 60000 + 60000
+    for (let i = 0; i < 8 * 1440; i += 1) {
+      if (tierAt(t) !== current) return t
+      t += 60000
+    }
+    return null
+  }
+  function priceFor(model) {
+    const name = String(model || '').toLowerCase()
+    const key = PRICES[name] ? name : ALIASES[name]
+    if (key && PRICES[key]) return { ...PRICES[key], model: name, assumed: false }
+    return { ...PRICES['deepseek-flash'], model: name || 'unknown', assumed: true }
+  }
+  function costOfTokens(t, price, tier) {
+    const factor = tier === 'peak' ? 2 : 1
+    const missLike = (t.miss || 0) + (t.write || 0)
+    return (missLike * price.miss + (t.hit || 0) * price.hit + (t.out || 0) * price.out) * factor / 1e6
+  }
+  function money(v) {
+    if (!v) return '¥0'
+    if (v < 0.0001) return '<¥0.0001'
+    return '¥' + v.toFixed(v < 0.01 ? 4 : v < 1 ? 3 : 2)
+  }
+  function tokens(v) {
+    if (v < 1000) return String(Math.round(v))
+    if (v < 1e6) return (v / 1e3).toFixed(v < 1e4 ? 1 : 0) + 'k'
+    return (v / 1e6).toFixed(2) + 'M'
+  }
+  function splitDuration(ms) {
+    const total = Math.max(0, Math.floor(ms / 60000))
+    return { hours: Math.floor(total / 60), minutes: total % 60 }
+  }
+
+  const T = {
+    title: '会话成本', estimate: '估算', requests: '次请求', empty: '还没有计费请求',
+    bucketMiss: '输入（缓存未命中）', bucketHit: '输入（缓存命中）', bucketWrite: '缓存写入', bucketOut: '输出',
+    colTokens: 'tokens', colAmount: '金额', split: '高峰 / 谷时 花费占比',
+    inPeak: '其中高峰', inOffpeak: '其中谷时', times: '次', peak: '高峰', offpeak: '谷时',
+    priceByTier: '峰谷单价', unit: '¥ / 百万 tokens',
+    intoPeak: '进入高峰', intoOffpeak: '进入谷时', after: '后', day: '天', hour: '小时', minute: '分',
+    cacheHit: '缓存命中', partial: '仅已加载', updated: '更新于',
+    caveat: '按已公布价目表计算，未含法定节假日日历。', assumed: '未知模型，按 deepseek-flash 计价',
+  }
+
+  // ---------- demo session ----------
+  const mixed = new URL(location.href).searchParams.get('demo') === 'mixed'
+
+  function simulatedNow() {
+    // The most recent weekday 18:20, so the ledger shows a peak block and an
+    // off-peak block at once.
+    const d = new Date()
+    const candidate = new Date(d)
+    candidate.setHours(18, 20, 0, 0)
+    while (candidate.getTime() > d.getTime() || [0, 6].includes(candidate.getDay())) {
+      candidate.setDate(candidate.getDate() - 1)
+    }
+    return candidate.getTime()
+  }
+
+  let seed = 20261114
+  const rnd = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648)
+
+  function buildSession(now) {
+    const model = 'deepseek-flash'
+    const price = priceFor(model)
+    const count = 14
+    const stepMs = 26 * 60 * 1000
+    const steps = []
+    for (let i = 0; i < count; i += 1) {
+      const time = now - (count - i) * stepMs
+      const t = {
+        miss: 900 + Math.round(rnd() * 5200),
+        hit: 12000 + Math.round(rnd() * 46000),
+        write: rnd() > 0.85 ? 400 + Math.round(rnd() * 900) : 0,
+        out: 260 + Math.round(rnd() * 700),
+      }
+      const tier = tierAt(time)
+      steps.push({ time, tier, tokens: t, cost: costOfTokens(t, price, tier) })
+    }
+    const sum = (pick) => steps.reduce((acc, s) => acc + pick(s), 0)
+    const tokensTotal = steps.reduce((acc, s) => ({
+      miss: acc.miss + s.tokens.miss, hit: acc.hit + s.tokens.hit,
+      write: acc.write + s.tokens.write, out: acc.out + s.tokens.out,
+    }), { miss: 0, hit: 0, write: 0, out: 0 })
+    const tiers = { peak: { cost: 0, steps: 0 }, offpeak: { cost: 0, steps: 0 } }
+    for (const s of steps) { tiers[s.tier].cost += s.cost; tiers[s.tier].steps += 1 }
+    const costByBucket = {
+      miss: sum((s) => costOfTokens({ miss: s.tokens.miss }, price, s.tier)),
+      hit: sum((s) => costOfTokens({ hit: s.tokens.hit }, price, s.tier)),
+      write: sum((s) => costOfTokens({ write: s.tokens.write }, price, s.tier)),
+      out: sum((s) => costOfTokens({ out: s.tokens.out }, price, s.tier)),
+    }
+    return { steps, total: sum((s) => s.cost), tokens: tokensTotal, tiers, costByBucket, price, model }
+  }
+
+  // ---------- render: markup mirrors client.js CostCard ----------
+  function cacheHitPercent(t) {
+    const prompt = t.miss + t.hit + t.write
+    return prompt > 0 ? Math.round((t.hit / prompt) * 100) : null
+  }
+
+  function countdownText(now, tier) {
+    const at = nextChangeAt(now)
+    if (at === null) return ''
+    const remaining = Math.max(0, at - now)
+    const { hours, minutes } = splitDuration(remaining)
+    const days = Math.floor(hours / 24)
+    const label = tier === 'peak' ? T.intoOffpeak : T.intoPeak
+    let amount
+    if (remaining < 60000) amount = '<1' + T.minute
+    else if (days > 0) amount = days + T.day + (hours % 24) + T.hour
+    else if (hours > 0) amount = hours + T.hour + minutes + T.minute
+    else amount = minutes + T.minute
+    return label + ' · ' + amount + T.after
+  }
+
+  function pad(v) { return String(v).padStart(2, '0') }
+
+  function renderCard(session, now) {
+    const tier = tierAt(now)
+    const hit = cacheHitPercent(session.tokens)
+    const split = session.tiers.peak.cost + session.tiers.offpeak.cost
+    const peakShare = split > 0 ? (session.tiers.peak.cost / split) * 100 : 0
+    const rows = [
+      ['bucketMiss', session.tokens.miss, session.costByBucket.miss],
+      ['bucketHit', session.tokens.hit, session.costByBucket.hit],
+      ['bucketWrite', session.tokens.write, session.costByBucket.write],
+      ['bucketOut', session.tokens.out, session.costByBucket.out],
+    ].filter((row) => row[1] > 0)
+
+    const body = rows.length === 0
+      ? `<tr><td colspan="3" class="cst-muted" style="padding:5px 0">${T.empty}</td></tr>`
+      : rows.map(([key, count, amount]) =>
+        `<tr><td>${T[key]}</td><td class="cst-muted">${tokens(count)}</td><td>${money(amount)}</td></tr>`).join('')
+
+    const priceRows = [['bucketHit', session.price.hit], ['bucketMiss', session.price.miss], ['bucketOut', session.price.out]]
+      .map(([key, base]) => `<tr><td>${T[key]}</td>
+        <td class="${tier === 'offpeak' ? '' : 'cst-muted'}">¥${base.toFixed(2)}</td>
+        <td class="${tier === 'peak' ? '' : 'cst-muted'}">¥${(base * 2).toFixed(2)}</td></tr>`).join('')
+
+    return `<section class="cst-card" aria-label="${T.title}">
+      <div class="cst-head">
+        <span class="cst-title">${T.title}</span>
+        <span class="cst-badge">
+          <span class="cst-dot" style="background:var(${tier === 'peak' ? '--warn' : '--ok'})"></span>
+          ${tier === 'peak' ? T.peak : T.offpeak}
+        </span>
+      </div>
+      <div class="cst-total">${money(session.total)}</div>
+      <div class="cst-sub">${T.estimate} · ${session.steps.length} ${T.requests}${hit === null ? '' : ' · ' + T.cacheHit + ' ' + hit + '%'}</div>
+      <table class="cst-table">
+        <thead><tr><th></th><th>${T.colTokens}</th><th>${T.colAmount}</th></tr></thead>
+        <tbody>${body}</tbody>
+      </table>
+      <hr class="cst-rule">
+      <div class="cst-label">${T.split}</div>
+      <div class="cst-bar" aria-hidden="true">
+        <span class="cst-seg-peak" style="width:${peakShare}%"></span>
+        <span class="cst-seg-offpeak" style="width:${100 - peakShare}%"></span>
+      </div>
+      <div class="cst-split-rows">
+        <div><span class="cst-muted">${T.inPeak} · ${session.tiers.peak.steps}${T.times}</span><span>${money(session.tiers.peak.cost)}</span></div>
+        <div><span class="cst-muted">${T.inOffpeak} · ${session.tiers.offpeak.steps}${T.times}</span><span>${money(session.tiers.offpeak.cost)}</span></div>
+      </div>
+      <hr class="cst-rule">
+      <table class="cst-table cst-price">
+        <thead><tr><th>${T.priceByTier}</th>
+          <th class="${tier === 'offpeak' ? 'current' : ''}">${T.offpeak}</th>
+          <th class="${tier === 'peak' ? 'current' : ''}">${T.peak}</th></tr></thead>
+        <tbody>${priceRows}
+          <tr><td colspan="3" class="cst-muted" style="padding-top:5px">${T.unit} · ${session.model}</td></tr>
+        </tbody>
+      </table>
+      <div class="cst-foot">
+        <span>${countdownText(now, tier)}</span>
+        <span>${T.updated} ${pad(new Date(now).getHours())}:${pad(new Date(now).getMinutes())}</span>
+        <span>${T.caveat}</span>
+      </div>
+    </section>`
+  }
+
+  function render() {
+    const now = mixed ? simulatedNow() : Date.now()
+    document.getElementById('widget').innerHTML = renderCard(buildSession(now), now)
+  }
+
+  render()
+  setInterval(render, 30000)
+</script>
+</body>
+</html>

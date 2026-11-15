@@ -1,0 +1,52 @@
+{
+  "name": "dsh-session-cost",
+  "version": "1.0.0",
+  "description": "A flat session-cost card for DeepSeek Harness: spend so far, peak/off-peak split, and the unit prices in force.",
+  "type": "module",
+  "license": "MIT",
+  "author": "menzi11",
+  "homepage": "https://github.com/menzi11/dsh-session-cost#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/menzi11/dsh-session-cost.git"
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "plugin",
+    "cost",
+    "pricing",
+    "usage"
+  ],
+  "scripts": {
+    "test": "node test/cost-helpers.test.mjs"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "docs",
+    "icon.svg"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-session"
+      ]
+    }
+  }
+}
